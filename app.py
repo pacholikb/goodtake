@@ -4,7 +4,7 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 
-st.title("Pricing Calculator")
+st.title("GL Pricing Calculator")
 
 st.sidebar.header("Take Rate Configurations")
 
