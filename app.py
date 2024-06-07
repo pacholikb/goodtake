@@ -3,14 +3,18 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
 
-st.title("GL Pricing Calculator")
+st.title("GL Take Rate Visualization")
+st.write("This app visualizes different take rate scenarios over a period of 36 months.")
 
 st.sidebar.header("Take Rate Configurations")
 
 # Input projected gross revenue
 months = 36
-gross_revenue = st.sidebar.number_input("Monthly Gross Revenue", min_value=0, value=6000)
+with st.sidebar.expander("FGC Contract Value"):
+    gross_revenue = st.number_input(label="Enter the average contract value:", min_value=0, value=6000, step=1000)
 gross_revenue = [gross_revenue]*months
 
 # Static take rate
@@ -120,19 +124,19 @@ with tab2:
     fig.add_trace(go.Bar(
         x=df["Month"],
         y=df["Net Revenue (Static)"],
-        name='Scenario #1 - (20%)',
+        name='Scenario #1',
         marker_color='#008e82'
     ))
     fig.add_trace(go.Bar(
         x=df["Month"],
         y=df["Net Revenue (Stepped)"],
-        name='Scenario #2 - (30%,20%,10%)',
+        name='Scenario #2',
         marker_color='black'
     ))
     fig.add_trace(go.Bar(
         x=df["Month"],
         y=df["Net Revenue (Stepped #2)"],
-        name='Scenario #3 - (35%,25%,15%)',
+        name='Scenario #3',
         marker_color='#ff7f0e' # Different color for Scenario 3
     ))
 
@@ -152,21 +156,18 @@ with tab2:
 
 # Summary Table
 summary_data = {
-    "": ["Net Revenue", "3 Months", "6 Months", "12 Months", "24 Months", "36 Months"],
-    "Scenario 1": ["", 
-                   "${:,.2f}".format(round(sum(df[df["Month"] <= 3]["Net Revenue (Static)"]))), 
+    "": ["3 Months", "6 Months", "12 Months", "24 Months", "36 Months"],
+    "Scenario 1": ["${:,.2f}".format(round(sum(df[df["Month"] <= 3]["Net Revenue (Static)"]))), 
                    "${:,.2f}".format(round(sum(df[df["Month"] <= 6]["Net Revenue (Static)"]))), 
                    "${:,.2f}".format(round(sum(df[df["Month"] <= 12]["Net Revenue (Static)"]))), 
                    "${:,.2f}".format(round(sum(df[df["Month"] <= 24]["Net Revenue (Static)"]))),
                    "${:,.2f}".format(round(sum(df[df["Month"] <= 36]["Net Revenue (Static)"])))],
-    "Scenario 2": ["", 
-                   "${:,.2f}".format(round(sum(df[df["Month"] <= 3]["Net Revenue (Stepped)"]))), 
+    "Scenario 2": ["${:,.2f}".format(round(sum(df[df["Month"] <= 3]["Net Revenue (Stepped)"]))), 
                    "${:,.2f}".format(round(sum(df[df["Month"] <= 6]["Net Revenue (Stepped)"]))), 
                    "${:,.2f}".format(round(sum(df[df["Month"] <= 12]["Net Revenue (Stepped)"]))), 
                    "${:,.2f}".format(round(sum(df[df["Month"] <= 24]["Net Revenue (Stepped)"]))),
                    "${:,.2f}".format(round(sum(df[df["Month"] <= 36]["Net Revenue (Stepped)"])))],
-    "Scenario 3": ["", 
-                   "${:,.2f}".format(round(sum(df[df["Month"] <= 3]["Net Revenue (Stepped #2)"]))), 
+    "Scenario 3": ["${:,.2f}".format(round(sum(df[df["Month"] <= 3]["Net Revenue (Stepped #2)"]))), 
                    "${:,.2f}".format(round(sum(df[df["Month"] <= 6]["Net Revenue (Stepped #2)"]))), 
                    "${:,.2f}".format(round(sum(df[df["Month"] <= 12]["Net Revenue (Stepped #2)"]))), 
                    "${:,.2f}".format(round(sum(df[df["Month"] <= 24]["Net Revenue (Stepped #2)"]))),
@@ -177,5 +178,6 @@ summary_df = pd.DataFrame(summary_data)
 # Remove index
 summary_df.set_index('', inplace=True)
 
+st.subheader("Net Revenue")
 st.dataframe(summary_df)
 
